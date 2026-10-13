@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { getResidents } from "../../services/residentService";
+import { getResidents } from "../../services/residentService.js";
 import ResidentCard from "../../components/ResidentCard.vue"; // AÑADIDO
 
 const router = useRouter();
