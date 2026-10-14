@@ -20,9 +20,28 @@ const routes = [
         component: () => import("../views/residents/ResidentsView.vue"),
         meta: { requiresAuth: true },
       },
-    ],   
-  },     
-];      
+      // NO HABÍA ENRUTADO!
+      {
+        path: "residents/new",
+        name: "resident-new",
+        component: () => import("../views/residents/ResidentFormView.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "residents/:id",
+        name: "resident-detail",
+        component: () => import("../views/residents/ResidentDetailView.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "residents/:id/edit",
+        name: "resident-edit",
+        component: () => import("../views/residents/ResidentFormView.vue"),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(),
