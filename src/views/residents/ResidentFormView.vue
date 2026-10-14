@@ -1,8 +1,8 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getResident, createResident, updateResident } from "../../services/residentService";
-import { gradeLabel } from "../../utils/grade";
+import { getResident, createResident, updateResident } from "../../services/residentService.js";
+import { gradeLabel } from "../../utils/grade.js";
 import BaseInput from "../../components/BaseInput.vue";
 import BaseSelect from "../../components/BaseSelect.vue";
 
