@@ -4,6 +4,8 @@ import { useRoute, useRouter } from "vue-router";
 import { getResident, deleteResident } from "../../services/residentService";
 import { gradeLabel } from "../../utils/grade";
 import InfoField from "../../components/InfoField.vue";
+import { getRooms, assignResident, removeResident } from "../../services/roomService";
+import BaseSelect from "../../components/BaseSelect.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -13,6 +15,12 @@ const loading = ref(true);
 const error = ref("");
 
 const residentId = route.params.id;
+
+//Estado de asignación de la habitación.
+const rooms = ref([]);
+const selectedRoomId = ref("");
+const assignError = ref("");
+const assigning = ref(false);
 
 const fullName = computed(() =>
   resident.value ? `${resident.value.firstName} ${resident.value.lastName}` : ""
@@ -30,6 +38,17 @@ const family = computed(() => {
   return rel ? `${name} (${rel})` : name;
 });
 
+const currentRoom = computed(() =>
+  resident.value?.roomNumber
+    ? rooms.value.find((r) => r.number === resident.value.roomNumber) ?? null
+    : null
+);
+const roomOptions = computed(() =>
+  rooms.value
+    .filter((r) => !r.full)
+    .map((r) => ({ value: r.id, label: `Hab. ${r.number} · ${r.occupancy}/${r.capacity}` }))
+);
+
 async function loadResident() {
   loading.value = true;
   error.value = "";
@@ -42,12 +61,52 @@ async function loadResident() {
   }
 }
 
+async function loadRooms() {
+  try {
+    rooms.value = await getRooms();
+  } catch (e) {
+    rooms.value = [];
+  }
+}
+
 function goBack() {
   router.push({ name: "residents" });
 }
 
 function goToEdit() {
   router.push({ name: "resident-edit", params: { id: residentId } });
+}
+
+async function handleAssign() {
+  if (!selectedRoomId.value) return;
+  assigning.value = true;
+  assignError.value = "";
+  try {
+    await assignResident(selectedRoomId.value, residentId);
+    await Promise.all([loadResident(), loadRooms()]); 
+    selectedRoomId.value = "";
+  } catch (e) {
+    assignError.value =
+      e.status === 409
+        ? e.data?.message || "La habitación está completa."
+        : "No se pudo asignar la habitación.";
+  } finally {
+    assigning.value = false;
+  }
+}
+
+async function handleRemove() {
+  if (!currentRoom.value) return;
+  assigning.value = true;
+  assignError.value = "";
+  try {
+    await removeResident(currentRoom.value.id, residentId);
+    await Promise.all([loadResident(), loadRooms()]);
+  } catch (e) {
+    assignError.value = "No se pudo quitar de la habitación.";
+  } finally {
+    assigning.value = false;
+  }
 }
 
 async function handleDelete() {
@@ -60,9 +119,12 @@ async function handleDelete() {
   }
 }
 
-onMounted(loadResident);
-</script>
+onMounted(() => {
+  loadResident();
+  loadRooms();
+});
 
+</script>
 <template>
   <section class="mx-auto max-w-2xl">
     <div class="mb-4 flex items-center justify-between">
@@ -159,6 +221,51 @@ onMounted(loadResident);
             </a>
           </InfoField>
         </div>
+      </div>
+            <!-- Asignación de la habitación. -->
+      <div class="mt-4 rounded-2xl border border-border bg-surface p-6">
+        <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-text-muted">Habitación</h2>
+
+        <!-- Con habitación: mostrar o quitar. -->
+        <div v-if="currentRoom" class="flex items-center justify-between">
+          <p class="text-sm text-text">
+            Asignado a <span class="font-semibold">Hab. {{ currentRoom.number }}</span>
+            <span class="text-text-muted"> ({{ currentRoom.occupancy }}/{{ currentRoom.capacity }})</span>
+          </p>
+          <button
+            class="rounded-lg px-3 py-1.5 text-sm font-medium text-error hover:bg-error/10 disabled:opacity-60"
+            :disabled="assigning"
+            @click="handleRemove"
+          >
+            Quitar
+          </button>
+        </div>
+
+        <!-- Sin habitación: selector + asignar. -->
+        <div v-else>
+          <p v-if="roomOptions.length === 0" class="text-sm text-text-muted">
+            No hay habitaciones disponibles.
+          </p>
+          <div v-else class="flex items-end gap-3">
+            <div class="flex-1">
+              <BaseSelect
+                v-model="selectedRoomId"
+                label="Asignar a habitación"
+                :options="roomOptions"
+                placeholder="Selecciona habitación…"
+              />
+            </div>
+            <button
+              class="rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-navy-dark disabled:opacity-60"
+              :disabled="assigning || !selectedRoomId"
+              @click="handleAssign"
+            >
+              {{ assigning ? "Asignando…" : "Asignar" }}
+            </button>
+          </div>
+        </div>
+
+        <p v-if="assignError" class="mt-3 text-sm text-error">{{ assignError }}</p>
       </div>
     </template>
   </section>
