@@ -9,7 +9,7 @@ const mobileNavOpen = ref(false);
 
 const navItems = [
   { name: "residents", label: "Residentes", icon: "M12 4a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0" },
-  //{ name: "rooms", label: "Habitaciones", icon: "M3 7l9-4 9 4v10l-9 4-9-4V7z" },
+  { name: "rooms", label: "Habitaciones", icon: "M3 7l9-4 9 4v10l-9 4-9-4V7z" },
   //{ name: "professionals", label: "Profesionales", icon: "M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87" },
 ];
 
