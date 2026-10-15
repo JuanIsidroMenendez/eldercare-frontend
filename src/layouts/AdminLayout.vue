@@ -33,7 +33,12 @@ function logout() {
               <path stroke-linecap="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span class="text-lg font-bold tracking-tight">Eldercare</span>
+          <RouterLink
+            :to="{ name: 'residents' }"
+            class="text-lg font-bold tracking-tight hover:opacity-80"
+          >
+            Eldercare
+          </RouterLink>
         </div>
 
         <div class="flex items-center gap-3">
