@@ -35,6 +35,7 @@ const serverError = ref("");
 
 // gradeLabel.js.
 const gradeOptions = [
+  { value: "SIN_GRADO", label: gradeLabel("SIN_GRADO") },
   { value: "GRADO_I", label: gradeLabel("GRADO_I") },
   { value: "GRADO_II", label: gradeLabel("GRADO_II") },
   { value: "GRADO_III", label: gradeLabel("GRADO_III") },
