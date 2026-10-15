@@ -12,7 +12,7 @@ function fullName(r) {
 }
 // Backend ya ajustado.
 function roomLabel(r) {
-  return r.room?.number ? `Hab. ${r.room.number}` : "Sin habitación";
+  return r.roomNumber ? `Hab. ${r.roomNumber}` : "Sin habitación"; 
 }
 </script>
 
