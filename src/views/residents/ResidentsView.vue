@@ -18,6 +18,7 @@ const gradeFilters = [
   { value: "GRADO_I", label: "Grado I" },
   { value: "GRADO_II", label: "Grado II" },
   { value: "GRADO_III", label: "Grado III" },
+  { value: "SIN_GRADO", label: "Sin grado" }
 ];
 
 const filteredResidents = computed(() => {
