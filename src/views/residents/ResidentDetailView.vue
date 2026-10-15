@@ -6,6 +6,9 @@ import { gradeLabel } from "../../utils/grade";
 import InfoField from "../../components/InfoField.vue";
 import { getRooms, assignResident, removeResident } from "../../services/roomService";
 import BaseSelect from "../../components/BaseSelect.vue";
+import BaseTextarea from "../../components/BaseTextarea.vue"; 
+import ReportCard from "../../components/ReportCard.vue"; 
+
 
 const route = useRoute();
 const router = useRouter();
@@ -21,6 +24,12 @@ const rooms = ref([]);
 const selectedRoomId = ref("");
 const assignError = ref("");
 const assigning = ref(false);
+
+// Informes.
+const reports = ref([]);
+const newReport = ref("");
+const reportError = ref("");
+const savingReport = ref(false);
 
 const fullName = computed(() =>
   resident.value ? `${resident.value.firstName} ${resident.value.lastName}` : ""
@@ -69,6 +78,14 @@ async function loadRooms() {
   }
 }
 
+async function loadReports() {
+  try {
+    reports.value = await getResidentReports(residentId);
+  } catch (e) {
+    reports.value = [];
+  }
+}
+
 function goBack() {
   router.push({ name: "residents" });
 }
@@ -109,6 +126,21 @@ async function handleRemove() {
   }
 }
 
+async function handleCreateReport() {
+  if (!newReport.value.trim()) return;
+  savingReport.value = true;
+  reportError.value = "";
+  try {
+    await createReport({ residentId: Number(residentId), content: newReport.value.trim() });
+    newReport.value = "";
+    await loadReports();
+  } catch (e) {
+    reportError.value = "No se pudo guardar el informe.";
+  } finally {
+    savingReport.value = false;
+  }
+}
+
 async function handleDelete() {
   if (!confirm(`¿Eliminar a ${fullName.value}? Esta acción no se puede deshacer.`)) return;
   try {
@@ -122,6 +154,7 @@ async function handleDelete() {
 onMounted(() => {
   loadResident();
   loadRooms();
+  loadReports();
 });
 
 </script>
@@ -266,6 +299,30 @@ onMounted(() => {
         </div>
 
         <p v-if="assignError" class="mt-3 text-sm text-error">{{ assignError }}</p>
+      </div>
+
+    <!-- Informes. -->
+      <div class="mt-4 rounded-2xl border border-border bg-surface p-6">
+        <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-text-muted">Informes</h2>
+        <!-- Nuevo informe -->
+        <div class="mb-5">
+          <BaseTextarea v-model="newReport" placeholder="Escribe un nuevo informe…" :rows="3" />
+          <div class="mt-2 flex justify-end">
+            <button
+              class="rounded-full bg-navy px-5 py-2 text-sm font-semibold text-white hover:bg-navy-dark disabled:opacity-60"
+              :disabled="savingReport || !newReport.trim()"
+              @click="handleCreateReport"
+            >
+              {{ savingReport ? "Guardando…" : "+ Nuevo informe" }}
+            </button>
+          </div>
+          <p v-if="reportError" class="mt-1 text-sm text-error">{{ reportError }}</p>
+        </div>
+        <!-- Listado de informes -->
+        <p v-if="reports.length === 0" class="text-sm text-text-muted">Todavía no hay informes.</p>
+        <div v-else class="flex flex-col gap-4">
+          <ReportCard v-for="rep in reports" :key="rep.id" :report="rep" />
+        </div>
       </div>
     </template>
   </section>
