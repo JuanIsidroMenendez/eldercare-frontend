@@ -47,7 +47,7 @@ function logout() {
             <p class="text-xs text-white/70 leading-tight">Director</p>
           </div>
           <div class="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-semibold">
-            L
+            C
           </div>
           <button class="rounded-lg p-2 hover:bg-navy-dark" @click="logout" aria-label="Cerrar sesión">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
