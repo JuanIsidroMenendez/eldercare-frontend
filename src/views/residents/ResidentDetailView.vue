@@ -301,8 +301,8 @@ onMounted(() => {
         <p v-if="assignError" class="mt-3 text-sm text-error">{{ assignError }}</p>
       </div>
 
-    <!-- Informes. -->
-      <div class="mt-4 rounded-2xl border border-border bg-surface p-6">
+    <!-- Informes. OCULTO TEMPORALMENTE -->
+      <div v-if="false" class="mt-4 rounded-2xl border border-border bg-surface p-6">
         <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-text-muted">Informes</h2>
         <!-- Nuevo informe -->
         <div class="mb-5">
